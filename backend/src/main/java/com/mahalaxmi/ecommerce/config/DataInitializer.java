@@ -22,8 +22,8 @@ public class DataInitializer implements CommandLineRunner {
 
     @Override
     public void run(String... args) {
-        // Only initialize if database is empty
-        if (productRepository.count() == 0) {
+        // Only initialize if database is empty (both products AND categories)
+        if (productRepository.count() == 0 && categoryRepository.count() == 0) {
             initializeData();
         }
     }
