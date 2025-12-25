@@ -30,8 +30,9 @@ const Register = () => {
       login(response);
       toast.success('Welcome to Mahalaxmi Enterprise!');
       navigate('/');
-    } catch (error) {
-      toast.error('Registration failed. Please try again.');
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.response?.data?.error || 'Registration failed. Please try again.';
+      toast.error(message);
     } finally {
       setIsLoading(false);
     }
