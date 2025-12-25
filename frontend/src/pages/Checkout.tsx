@@ -6,7 +6,6 @@ import {
   Truck, 
   MapPin, 
   ShoppingBag, 
-  ChevronRight, 
   Check, 
   Shield, 
   Clock, 
@@ -438,7 +437,7 @@ const Checkout = () => {
                     <div key={item.id} className="flex gap-3">
                       <div className="w-16 h-16 bg-gray-100 rounded-lg overflow-hidden flex-shrink-0">
                         <img
-                          src={item.product.imageUrl || 'https://placehold.co/64x64?text=Product'}
+                          src={item.product.imageUrls?.[0] || 'https://placehold.co/64x64?text=Product'}
                           alt={item.product.name}
                           className="w-full h-full object-cover"
                         />
