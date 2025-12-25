@@ -56,7 +56,14 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(List.of("http://localhost:5173", "http://localhost:5174", "http://localhost:5175", "http://localhost:5176", "http://localhost:3000"));
+        configuration.setAllowedOrigins(List.of(
+                "http://localhost:5173", 
+                "http://localhost:5174", 
+                "http://localhost:5175", 
+                "http://localhost:5176", 
+                "http://localhost:3000",
+                "https://ecommerce-three-ruby-yrdj6u0e0e.vercel.app"
+        ));
         configuration.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"));
         configuration.setAllowedHeaders(List.of("*"));
         configuration.setAllowCredentials(true);
