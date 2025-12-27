@@ -14,6 +14,12 @@ import Profile from './pages/Profile';
 import Checkout from './pages/Checkout';
 import ProtectedRoute from './components/ProtectedRoute';
 import ScrollToTop from './components/ScrollToTop';
+import AdminRoute from './components/AdminRoute';
+import AdminLayout from './components/admin/AdminLayout';
+import AdminDashboard from './pages/admin/AdminDashboard';
+import AdminProducts from './pages/admin/AdminProducts';
+import AdminCategories from './pages/admin/AdminCategories';
+import AdminOrders from './pages/admin/AdminOrders';
 
 function App() {
   const initialize = useAuthStore((state) => state.initialize);
@@ -62,9 +68,25 @@ function App() {
           }
         />
       </Route>
+
+      {/* Admin Routes */}
+      <Route
+        path="/admin"
+        element={
+          <AdminRoute>
+            <AdminLayout />
+          </AdminRoute>
+        }
+      >
+        <Route index element={<AdminDashboard />} />
+        <Route path="products" element={<AdminProducts />} />
+        <Route path="categories" element={<AdminCategories />} />
+        <Route path="orders" element={<AdminOrders />} />
+      </Route>
     </Routes>
     </>
   );
 }
 
 export default App;
+

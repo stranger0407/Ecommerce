@@ -166,6 +166,13 @@ public class OrderService {
         return "ORD-" + System.currentTimeMillis() + "-" + UUID.randomUUID().toString().substring(0, 4).toUpperCase();
     }
 
+    /**
+     * Convert Order entity to OrderDto (public method for admin service).
+     */
+    public OrderDto convertToDto(Order order) {
+        return mapToDto(order);
+    }
+
     private OrderDto mapToDto(Order order) {
         return OrderDto.builder()
                 .id(order.getId())
