@@ -19,10 +19,9 @@ import {
   Clock,
   CheckCircle,
   XCircle,
-  AlertCircle,
-  X
+  AlertCircle
 } from 'lucide-react';
-import { api } from '@/lib/api';
+import axios from 'axios';
 import { Button, Badge, Spinner } from '@/components/ui';
 
 interface Order {
@@ -31,20 +30,10 @@ interface Order {
   createdAt: string;
   status: string;
   total: number;
-  subtotal: number;
-  tax: number;
-  shippingCost: number;
   items: Array<{
-    id: number;
-    product: {
-      id: number;
-      name: string;
-      imageUrls: string[];
-      price: number;
-    };
+    productName: string;
     quantity: number;
     price: number;
-    subtotal: number;
   }>;
 }
 
@@ -66,7 +55,6 @@ const Profile = () => {
   const tabFromUrl = searchParams.get('tab') as 'profile' | 'orders' | 'addresses' | 'settings' | null;
   const [activeTab, setActiveTab] = useState<'profile' | 'orders' | 'addresses' | 'settings'>(tabFromUrl || 'profile');
   const [orders, setOrders] = useState<Order[]>([]);
-  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
 
@@ -100,8 +88,8 @@ const Profile = () => {
   const fetchOrders = async () => {
     setLoading(true);
     try {
-      const response = await api.get<any>('/orders');
-      setOrders(response.content || []);
+      const response = await axios.get('/api/orders/my-orders');
+      setOrders(response.data);
     } catch (error) {
       console.error('Failed to fetch orders:', error);
     } finally {
@@ -113,7 +101,7 @@ const Profile = () => {
     e.preventDefault();
     setSaving(true);
     try {
-      await api.put('/users/profile', profileData);
+      await axios.put('/api/users/profile', profileData);
       alert('Profile updated successfully!');
     } catch (error) {
       console.error('Failed to update profile:', error);
@@ -143,7 +131,6 @@ const Profile = () => {
   ];
 
   return (
-    <>
     <div className="min-h-screen bg-gradient-to-b from-gray-50 to-white py-8">
       <div className="container-custom">
         {/* Page Header */}
@@ -340,21 +327,12 @@ const Profile = () => {
                             
                             <div className="border-t border-gray-100 pt-4">
                               {order.items.slice(0, 2).map((item, index) => (
-                                <div key={index} className="flex items-center gap-3 py-2 text-sm">
-                                  {item.product?.imageUrls?.[0] && (
-                                    <img 
-                                      src={item.product.imageUrls[0]} 
-                                      alt={item.product.name}
-                                      className="w-12 h-12 object-cover rounded-lg bg-gray-100"
-                                    />
-                                  )}
-                                  <div className="flex-1">
-                                    <span className="text-gray-700 font-medium">
-                                      {item.product?.name || 'Product'} × {item.quantity}
-                                    </span>
-                                  </div>
+                                <div key={index} className="flex justify-between py-2 text-sm">
+                                  <span className="text-gray-700">
+                                    {item.productName} × {item.quantity}
+                                  </span>
                                   <span className="font-medium text-gray-900">
-                                    ₹{item.subtotal?.toLocaleString('en-IN') || item.price?.toLocaleString('en-IN')}
+                                    ₹{item.price.toLocaleString('en-IN')}
                                   </span>
                                 </div>
                               ))}
@@ -372,7 +350,7 @@ const Profile = () => {
                                   ₹{order.total.toLocaleString('en-IN')}
                                 </p>
                               </div>
-                              <Button variant="outline" size="sm" onClick={() => setSelectedOrder(order)}>
+                              <Button variant="outline" size="sm">
                                 <Eye className="h-4 w-4 mr-2" />
                                 View Details
                               </Button>
@@ -514,104 +492,6 @@ const Profile = () => {
         </div>
       </div>
     </div>
-
-      {/* Order Detail Modal */}
-      {selectedOrder && (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-2xl shadow-xl max-w-2xl w-full max-h-[90vh] overflow-y-auto">
-            {/* Modal Header */}
-            <div className="flex items-center justify-between p-6 border-b border-gray-100">
-              <div>
-                <h2 className="text-xl font-bold text-gray-900">Order #{selectedOrder.orderNumber}</h2>
-                <p className="text-sm text-gray-500 mt-1">
-                  {new Date(selectedOrder.createdAt).toLocaleDateString('en-IN', {
-                    year: 'numeric',
-                    month: 'long',
-                    day: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </p>
-              </div>
-              <button 
-                onClick={() => setSelectedOrder(null)}
-                className="p-2 hover:bg-gray-100 rounded-full transition-colors"
-              >
-                <X className="h-5 w-5 text-gray-500" />
-              </button>
-            </div>
-
-            {/* Order Status */}
-            <div className="p-6 border-b border-gray-100">
-              <div className="flex items-center gap-3">
-                <Badge variant={getStatusConfig(selectedOrder.status).color}>
-                  {getStatusConfig(selectedOrder.status).label}
-                </Badge>
-              </div>
-            </div>
-
-            {/* Order Items */}
-            <div className="p-6 border-b border-gray-100">
-              <h3 className="font-semibold text-gray-900 mb-4">Order Items</h3>
-              <div className="space-y-4">
-                {selectedOrder.items.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4 p-3 bg-gray-50 rounded-lg">
-                    {item.product?.imageUrls?.[0] ? (
-                      <img 
-                        src={item.product.imageUrls[0]} 
-                        alt={item.product.name}
-                        className="w-16 h-16 object-cover rounded-lg bg-white"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 bg-gray-200 rounded-lg flex items-center justify-center">
-                        <Package className="h-8 w-8 text-gray-400" />
-                      </div>
-                    )}
-                    <div className="flex-1">
-                      <h4 className="font-medium text-gray-900">{item.product?.name || 'Product'}</h4>
-                      <p className="text-sm text-gray-500">Qty: {item.quantity} × ₹{item.price?.toLocaleString('en-IN')}</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="font-semibold text-gray-900">₹{item.subtotal?.toLocaleString('en-IN')}</p>
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Order Summary */}
-            <div className="p-6">
-              <h3 className="font-semibold text-gray-900 mb-4">Order Summary</h3>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Subtotal</span>
-                  <span className="text-gray-900">₹{selectedOrder.subtotal?.toLocaleString('en-IN')}</span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Shipping</span>
-                  <span className="text-gray-900">
-                    {selectedOrder.shippingCost === 0 ? 'FREE' : `₹${selectedOrder.shippingCost?.toLocaleString('en-IN')}`}
-                  </span>
-                </div>
-                <div className="flex justify-between text-sm">
-                  <span className="text-gray-500">Tax (GST 18%)</span>
-                  <span className="text-gray-900">₹{selectedOrder.tax?.toLocaleString('en-IN')}</span>
-                </div>
-                <div className="border-t border-gray-100 pt-2 mt-2 flex justify-between">
-                  <span className="font-semibold text-gray-900">Total</span>
-                  <span className="font-bold text-xl text-primary-600">₹{selectedOrder.total?.toLocaleString('en-IN')}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-6 border-t border-gray-100 flex justify-end">
-              <Button onClick={() => setSelectedOrder(null)}>Close</Button>
-            </div>
-          </div>
-        </div>
-      )}
-    </>
   );
 };
 

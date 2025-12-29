@@ -11,7 +11,8 @@ import {
   Phone,
   Info,
   Home,
-  UserCircle
+  UserCircle,
+  Shield
 } from 'lucide-react';
 import { useAuthStore } from '@/store/authStore';
 import { useCartStore } from '@/store/cartStore';
@@ -200,6 +201,15 @@ const Header = () => {
                         </p>
                         <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                       </div>
+                      {user?.role === 'ADMIN' && (
+                        <Link
+                          to="/admin"
+                          className="flex items-center px-4 py-2.5 text-primary-600 hover:bg-primary-50 transition-colors font-medium"
+                        >
+                          <Shield className="h-4 w-4 mr-3" />
+                          Admin Dashboard
+                        </Link>
+                      )}
                       <Link
                         to="/profile"
                         className="flex items-center px-4 py-2.5 text-gray-700 hover:bg-gray-50 transition-colors"
