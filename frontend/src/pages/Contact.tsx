@@ -11,7 +11,7 @@ import {
   Building,
   Globe
 } from 'lucide-react';
-import { Button, Spinner } from '@/components/ui';
+import { Button } from '@/components/ui';
 
 const Contact = () => {
   const [formData, setFormData] = useState({

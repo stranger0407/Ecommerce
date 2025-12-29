@@ -253,7 +253,7 @@ const AdminDashboard = () => {
               {Object.entries(stats.salesByCategory)
                 .sort((a, b) => b[1] - a[1])
                 .slice(0, 5)
-                .map(([category, revenue], index) => {
+                .map(([category, revenue], _index) => {
                   const maxCatRevenue = Math.max(
                     ...Object.values(stats.salesByCategory)
                   );

@@ -450,7 +450,7 @@ const AdminProducts = () => {
                   </label>
                   <select
                     value={formData.type}
-                    onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                    onChange={(e) => setFormData({ ...formData, type: e.target.value as Product['type'] })}
                     required
                     className="w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-xl text-white focus:outline-none focus:ring-2 focus:ring-primary-500"
                   >
